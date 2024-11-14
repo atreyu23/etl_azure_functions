@@ -15,13 +15,15 @@ def procesar_ventas(file_data):
     except Exception as e:
         raise Exception(f"Error processing Ventas.xlsx: {str(e)}")
 
-def procesar_productos(file_data):
+def procesar_productos(file_data, product_list):
     try:
         # Leer el archivo CSV en memoria con una codificación adecuada
         df = pd.read_csv(BytesIO(file_data), encoding="ISO-8859-1")
+        mask = df["categoria"].isin(product_list)
+        df_filtered = df[mask]
         # Eliminar duplicados
-        df = df.drop_duplicates()
-        return df
+        df_filtered = df_filtered.drop_duplicates()
+        return df_filtered
 
     except Exception as e:
         raise Exception(f"Error processing productos.csv: {str(e)}")
@@ -38,11 +40,13 @@ def procesar_clientes(file_data):
     except Exception as e:
         raise Exception(f"Error processing clientes.csv: {str(e)}")
 
-def procesar_ciudades(file_data):
+def procesar_ciudades(file_data, ccaa_list):
     try:
         df = pd.read_json(BytesIO(file_data))
+        mask = df['comunidad_autónoma'].isin(ccaa_list)
+        df_filtered = df[mask]
 
-        return df
+        return df_filtered
     except Exception as e:
         raise Exception(f"Error processing ciudades.json: {str(e)}")
 

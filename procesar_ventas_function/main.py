@@ -4,12 +4,16 @@ from azure.storage.blob import BlobServiceClient
 import os
 import pyarrow as pa
 import pyarrow.parquet as pq
-
 # Importar las funciones de procesamiento
 from procesar_ventas_function.transformaciones \
     import procesar_ventas, procesar_productos, procesar_clientes, \
     procesar_ciudades
 
+from procesar_ventas_function.consts import \
+container_bronze, container_silver, container_gold, ccaa_list, \
+categorias_list
+
+#DECLARACIÓN DE VARIABLES
 # Mapeo de archivos y funciones de procesamiento
 FILES_TO_PROCESS = [
     {"file_name": "Ventas.xlsx", "processor": procesar_ventas},
@@ -19,7 +23,8 @@ FILES_TO_PROCESS = [
     # Puedes agregar más archivos y funciones aquí
 ]
 
-def procesar_archivo(blob_service_client, container_source, container_destiny, file_info):
+def procesar_archivo(blob_service_client, container_source, \
+                     container_destiny, file_info, values_list):
     try:
         # Obtener cliente del contenedor
         container_client = blob_service_client.get_container_client(container_source)
@@ -29,7 +34,10 @@ def procesar_archivo(blob_service_client, container_source, container_destiny, f
         file_data = blob_client.download_blob().readall()
 
         # Llamar a la función de procesamiento específica
-        df = file_info["processor"](file_data)
+        if file_info["file_name"] in ["ciudades.json","productos.csv"]:
+            df = file_info["processor"](file_data, values_list)
+        else:
+            df = file_info["processor"](file_data)
 
         # Convertir DataFrame a Parquet
         table = pa.Table.from_pandas(df)
@@ -58,17 +66,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     connection_string = os.getenv('AzureWebJobsStorage')
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
-    # Nombre del contenedor de origen
-    container_bronze = "bronze"
-
-    # Nombre contenedor destino
-    container_silver = "silver"
-
     try:
         # Procesar cada archivo en la lista
         for file_info in FILES_TO_PROCESS:
-            procesar_archivo(blob_service_client, container_bronze, \
-                             container_silver, file_info)
+            if file_info["file_name"] == 'ciudades.json':
+                procesar_archivo(blob_service_client, container_bronze, \
+                    container_silver, file_info, ccaa_list)
+            else:
+                procesar_archivo(blob_service_client, container_bronze, \
+                    container_silver, file_info, categorias_list)
 
         return func.HttpResponse("All files processed and stored as Parquet.", \
                                  status_code=200)
