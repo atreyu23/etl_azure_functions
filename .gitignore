@@ -1,0 +1,64 @@
+# Python general
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.env
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg
+*.egg-info/
+.eggs/
+.pytest_cache/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Azure Functions
+.local.settings.json       # Configuración local (contiene secrets como cadenas de conexión)
+*.azure                  # Archivos de Azure locales, tokens de autenticación, etc.
+*local_settings.json    # Evita posibles nombres alternativos para configuración local
+
+# Logs and debug output
+*.log
+logs/
+debug/
+.vscode/settings.json    # Configuración local de VS Code
+.vscode/
+
+# Environments and dependencies
+bin/
+obj/
+bin-debug/
+bin-release/
+lib/
+lib32/
+lib64/
+parts/
+sdist/
+wheels/
+develop-eggs/
+.installed.cfg
+*.egg-info/
+dist/
+.eggs/
+node_modules/
+
+# Virtual Environment
+*.env
+*.venv
+env/
+venv/
+
+# Configuración específica de IDEs
+.idea/
+*.sublime-workspace
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

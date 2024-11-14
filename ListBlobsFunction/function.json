@@ -1,0 +1,24 @@
+{
+  "bindings": [
+    {
+      "type": "httpTrigger",
+      "direction": "in",
+      "authLevel": "anonymous",
+      "name": "req",
+      "methods": ["get", "post"]
+    },
+    {
+      "type": "blob",
+      "direction": "in",
+      "name": "inputBlob",
+      "path": "raw/ciudades.json",
+      "connection": "AzureWebJobsStorage"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "$return"
+    }
+  ]
+}
+
