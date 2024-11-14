@@ -22,6 +22,7 @@ pip-delete-this-directory.txt
 .local.settings.json       # Configuración local (contiene secrets como cadenas de conexión)
 *.azure                  # Archivos de Azure locales, tokens de autenticación, etc.
 *local_settings.json    # Evita posibles nombres alternativos para configuración local
+*local.settings.json
 
 # Logs and debug output
 *.log
