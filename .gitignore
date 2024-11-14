@@ -66,4 +66,4 @@ etl_azure
 *.sln
 
 #otros archivos
-cacharreos.ipynb
+*cacharreos.ipynb*
