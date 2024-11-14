@@ -53,6 +53,7 @@ node_modules/
 *.venv
 env/
 venv/
+etl_azure
 
 # Configuración específica de IDEs
 .idea/
