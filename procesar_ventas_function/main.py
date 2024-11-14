@@ -6,19 +6,23 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 # Importar las funciones de procesamiento
-from procesar_ventas_function.transformaciones import procesar_ventas, procesar_productos
+from procesar_ventas_function.transformaciones \
+    import procesar_ventas, procesar_productos, procesar_clientes, \
+    procesar_ciudades
 
 # Mapeo de archivos y funciones de procesamiento
 FILES_TO_PROCESS = [
     {"file_name": "Ventas.xlsx", "processor": procesar_ventas},
     {"file_name": "productos.csv", "processor": procesar_productos},
+    {"file_name": "clientes.csv", "processor": procesar_clientes},
+    {"file_name": "ciudades.json", "processor": procesar_ciudades},
     # Puedes agregar más archivos y funciones aquí
 ]
 
-def procesar_archivo(blob_service_client, container_name, file_info):
+def procesar_archivo(blob_service_client, container_source, container_destiny, file_info):
     try:
         # Obtener cliente del contenedor
-        container_client = blob_service_client.get_container_client(container_name)
+        container_client = blob_service_client.get_container_client(container_source)
         blob_client = container_client.get_blob_client(file_info["file_name"])
 
         # Descargar el contenido del blob
@@ -29,12 +33,13 @@ def procesar_archivo(blob_service_client, container_name, file_info):
 
         # Convertir DataFrame a Parquet
         table = pa.Table.from_pandas(df)
-        parquet_file_name = file_info["file_name"].replace(".xlsx", ".parquet").replace(".csv", ".parquet")
+        parquet_file_name = file_info["file_name"].replace(".xlsx", ".parquet")\
+            .replace(".csv", ".parquet").replace(".json",".parquet")
         parquet_file = f"/tmp/{parquet_file_name}"
         pq.write_table(table, parquet_file)
 
         # Subir el archivo Parquet al contenedor 'master'
-        master_container_client = blob_service_client.get_container_client("master")
+        master_container_client = blob_service_client.get_container_client(container_destiny)
         master_blob_client = master_container_client.get_blob_client(parquet_file_name)
         
         with open(parquet_file, "rb") as f:
@@ -54,16 +59,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
     # Nombre del contenedor de origen
-    container_name = "raw"
+    container_bronze = "bronze"
+
+    # Nombre contenedor destino
+    container_silver = "silver"
 
     try:
         # Procesar cada archivo en la lista
         for file_info in FILES_TO_PROCESS:
-            procesar_archivo(blob_service_client, container_name, file_info)
+            procesar_archivo(blob_service_client, container_bronze, \
+                             container_silver, file_info)
 
-        return func.HttpResponse("All files processed and stored as Parquet.", status_code=200)
+        return func.HttpResponse("All files processed and stored as Parquet.", \
+                                 status_code=200)
     
     except Exception as e:
         logging.error(f"Error processing files: {str(e)}")
-        return func.HttpResponse(f"Error processing files: {str(e)}", status_code=500)
+        return func.HttpResponse(f"Error processing files: {str(e)}",\
+                                  status_code=500)
 

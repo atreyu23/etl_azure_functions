@@ -1,2 +1,2 @@
-# Este archivo puede mantenerse vacío, o puedes usarlo para inicializar módulos adicionales si es necesario.
+# Para invocar a la función main
 from .main import main

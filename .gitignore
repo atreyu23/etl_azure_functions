@@ -64,3 +64,6 @@ etl_azure
 *.ntvs*
 *.njsproj
 *.sln
+
+#otros archivos
+cacharreos.ipynb
