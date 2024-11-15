@@ -63,7 +63,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Starting processing of files from the raw container.")
 
     # Obtener la cadena de conexión desde las configuraciones de entorno
-    connection_string = os.getenv('AzureWebJobsStorage')
+    connection_string = os.getenv('MyStorageConnectionString')
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
     try:
